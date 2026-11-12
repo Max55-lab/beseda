@@ -1,6 +1,6 @@
 // Klijent za Beseda backend (zajednički podaci, računi, uredništvo).
 // Backend mora biti pokrenut na localhost:3002.
-const BASE = "/api";
+const BASE = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL + "/api" : "/api";
 
 function token() {
   try { return localStorage.getItem("beseda:token"); } catch { return null; }
