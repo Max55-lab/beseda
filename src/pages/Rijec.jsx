@@ -16,6 +16,7 @@ import {
   dohvatiSnimke,
   obrisiSnimku,
 } from "../lib/audio.js";
+import { api, hasToken } from "../lib/api.js";
 
 export default function Rijec() {
   const { id } = useParams();
@@ -51,6 +52,7 @@ export default function Rijec() {
   const [snimke, setSnimke] = useState([]);
   const [snima, setSnima] = useState(false);
   const [audioUrls, setAudioUrls] = useState({});
+  const [serverSnimke, setServerSnimke] = useState([]);
   const recorderRef = useRef(null);
   const chunksRef = useRef([]);
 
@@ -65,6 +67,19 @@ export default function Rijec() {
       aktivno = false;
     };
   }, [rijec.id]);
+
+  useEffect(() => {
+    let aktivno = true;
+    (async () => {
+      try {
+        const d = await api.recordings(rijec.backendId || rijec.id);
+        if (aktivno) setServerSnimke(d.recordings || []);
+      } catch {
+        // backend nedostupan
+      }
+    })();
+    return () => { aktivno = false; };
+  }, [rijec.id, rijec.backendId]);
 
   useEffect(() => {
     const urls = {};
@@ -93,6 +108,19 @@ export default function Rijec() {
           await snimiIzgovor(rijec.id, blob);
           const s = await dohvatiSnimke(rijec.id);
           setSnimke(s);
+          // upload to backend if logged in
+          if (hasToken() && rijec.backendId) {
+            const reader = new FileReader();
+            reader.onloadend = async () => {
+              try {
+                const base64 = reader.result.split(",")[1];
+                await api.uploadRecording(rijec.backendId, blob.type, base64);
+                const d = await api.recordings(rijec.backendId);
+                setServerSnimke(d.recordings || []);
+              } catch {}
+            };
+            reader.readAsDataURL(blob);
+          }
         }
         setSnima(false);
       };
@@ -270,6 +298,21 @@ export default function Rijec() {
                   <p className="forma-napomena">
                     Još nema snimki. Snimi prvi izgovor.
                   </p>
+                )}
+                {serverSnimke.length > 0 && (
+                  <div style={{ marginTop: 12 }}>
+                    <p className="rijec-labela" style={{ fontSize: 12 }}>Server snimke</p>
+                    <ul className="snimke-lista">
+                      {serverSnimke.map((s) => (
+                        <li key={s.id} className="snimke-red">
+                          <audio controls src={`/api/recordings/${s.id}/audio`} preload="none" />
+                          <span className="forma-napomena" style={{ fontSize: 11 }}>
+                            {s.created_at}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 )}
               </>
             )}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { getLang, loadLang, SUPPORTED } from "../lib/i18n.js";
+import { useAuth } from "../lib/useAuth.js";
 
 const links = [
   { to: "/karta", label: "Karta" },
@@ -14,6 +15,7 @@ export default function Layout() {
     () => localStorage.getItem("beseda:tema") || "svijetla"
   );
   const [lang, setLang] = useState(getLang());
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     document.documentElement.dataset.tema = tema === "tamna" ? "tamna" : "";
@@ -65,8 +67,20 @@ export default function Layout() {
           >
             {tema === "tamna" ? "☀" : "☾"}
           </button>
-          <Link to="/dodaj" className="btn btn-mali btn-terra">
-            Dodaj riječ
+          {user ? (
+            <span style={{ fontSize: 12, color: "var(--muted)" }}>
+              {user.username}{" "}
+              <button type="button" className="btn btn-mali btn-ghost" onClick={logout}>
+                Odjava
+              </button>
+            </span>
+          ) : (
+            <Link to="/zajednica" className="btn btn-mali btn-terra">
+              Prijava
+            </Link>
+          )}
+          <Link to="/dodaj" className="btn btn-mali btn-ghost">
+            Dodaj
           </Link>
         </div>
       </header>

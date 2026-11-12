@@ -34,8 +34,10 @@ export const api = {
   collections: () => req("/collections"),
   createCollection: (naziv) => req("/collections", { method: "POST", body: JSON.stringify({ naziv }) }),
   updateCollection: (id, rijeci) => req(`/collections/${id}`, { method: "PATCH", body: JSON.stringify({ rijeci }) }),
-  // stats
-  stats: () => req("/stats"),
+  // recordings
+  recordings: (rijecId) => req(`/recordings/${rijecId}`),
+  uploadRecording: (rijecId, mime, base64Data) => req("/recordings", { method: "POST", body: JSON.stringify({ rijec_id: rijecId, mime, data: base64Data }) }),
+  deleteRecording: (id) => req(`/recordings/${id}`, { method: "DELETE" }),
 };
 
 export function setToken(t) {

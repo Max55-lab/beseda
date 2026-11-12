@@ -493,7 +493,7 @@ textarea {
 }
 
 .pretraga input::placeholder {
-  color: #a4969f;
+  color: var(--muted);
 }
 
 .pretraga-btn {
@@ -860,7 +860,7 @@ textarea {
 
 .word-card:hover {
   transform: translateY(-4px);
-  border-color: #d9c7b0;
+  border-color: var(--must);
   box-shadow: 0 24px 40px -32px rgba(35, 26, 43, 0.6);
 }
 
@@ -2810,4 +2810,52 @@ textarea {
 }
 .skip-link:focus {
   left: 8px;
+}
+
+
+/* ---------------------------------------------------------------- dark mode: popravci */
+html[data-tema="tamna"] .pretraga input::placeholder {
+  color: var(--muted);
+}
+
+html[data-tema="tamna"] .word-card:hover {
+  border-color: var(--must);
+}
+
+html[data-tema="tamna"] .karta-kopno {
+  fill: #3a2f44;
+  stroke: #5a4a64;
+}
+
+html[data-tema="tamna"] .karta-susjed {
+  fill: #2a2235;
+  stroke: #4a3f55;
+}
+
+html[data-tema="tamna"] .karta-bih {
+  fill: #332a3d;
+  stroke: #5a4a64;
+}
+
+html[data-tema="tamna"] .karta-etiketa {
+  fill: #a89aad;
+}
+
+html[data-tema="tamna"] .karta-etiketa-susjed {
+  fill: #8a7a95;
+}
+
+html[data-tema="tamna"] .karta-kontrole button {
+  background: var(--paper);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+html[data-tema="tamna"] .pin-tooltip {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+html[data-tema="tamna"] .karta-legenda i {
+  border-color: var(--line);
 }
