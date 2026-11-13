@@ -26,6 +26,8 @@ Otvori u pregledniku (poželjno u incognito prozoru):
 3. **Provjera URL-a** → `https://beseda.onrender.com/` → **Testiraj uživo** → **Zatraži indeksiranje**.
 4. Isto ponovi za nekoliko važnijih stranica: `/karta`, `/rjecnik`, `/frazemi`.
 
+> **Važno:** kartica „Google indeks” prikazuje stari crawl, ne trenutno stanje. Ako piše „Otkriće: Nije provjereno u testovima uživo”, znači da live test nije pokrenut. Uvijek klikni **Testiraj uživo** i gledaj rezultat tog testa. Stari indeks može pokazivati grešku još dan-dva nakon popravka — to je normalno.
+
 > Google može keširati `robots.txt` do 24 sata. Ako i dalje piše „Blokirano datotekom robots.txt”, pričekaj dan i ponovi provjeru — datoteka je na poslužitelju već ispravna.
 
 ## Napomene
