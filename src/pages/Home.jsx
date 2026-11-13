@@ -9,8 +9,10 @@ import { RIJECI } from "../data/rijeci.js";
 import { FRAZEMI } from "../data/frazemi.js";
 import { wordOfTheDay } from "../lib/text.js";
 import { useAllWords } from "../lib/words.js";
+import { useI18n } from "../lib/i18n.js";
 
 export default function Home() {
+  const { t } = useI18n();
   const { words } = useAllWords();
   const dnevna = wordOfTheDay(RIJECI);
   const govor = getGovor(dnevna.govorId);
@@ -21,14 +23,12 @@ export default function Home() {
     <div className="page">
       <section className="hero container">
         <div className="hero-tekst">
-          <p className="kicker">Audio-rječnik hrvatskih govora</p>
+          <p className="kicker">{t("app_subtitle")}</p>
           <h1 className="hero-naslov">
             Rječnik <em>zavičaja</em>
           </h1>
           <p className="lead">
-            Svaka riječ ima svoje mjesto, svoj glas i svoju priču. Beseda ih čuva — da ih
-            možeš čuti, pronaći na karti i naučiti kroz igru. Otvorena je i onima koji
-            hrvatski uče iz cijeloga svijeta.
+            {t("home_lead")}
           </p>
 
           <SearchForm />
@@ -46,7 +46,7 @@ export default function Home() {
 
         <aside className="dnevna-kartica">
           <div className="dnevna-vrh">
-            <span className="dnevna-labela">Riječ dana</span>
+            <span className="dnevna-labela">{t("word_of_day")}</span>
             <span className="dnevna-mjesto">
               {govor.mjesto} · {narjecje.naziv}
             </span>
@@ -56,7 +56,7 @@ export default function Home() {
           <p className="dnevna-izgovor">[{dnevna.izgovor}]</p>
 
           <div className="dnevna-zvuk">
-            <PlayButton text={dnevna.rijec} label="Poslušaj" />
+            <PlayButton text={dnevna.rijec} label={t("listen")} />
             <Waveform />
           </div>
 

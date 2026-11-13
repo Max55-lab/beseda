@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import Layout from "./components/Layout.jsx";
+import Seo from "./components/Seo.jsx";
 import Home from "./pages/Home.jsx";
 import Karta from "./pages/Karta.jsx";
 import Rjecnik from "./pages/Rjecnik.jsx";
@@ -31,6 +32,7 @@ export default function App() {
   return (
     <>
       <ScrollToTop />
+      <Seo />
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />

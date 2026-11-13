@@ -70,7 +70,11 @@ export default function Zbirke() {
     const payload = btoa(
       JSON.stringify({ naziv: zbirka.naziv, rijeci: zbirka.rijeci })
     );
-    const url = `${window.location.origin}${window.location.pathname}#/zbirke?import=${payload}`;
+    const base =
+      window.location.protocol === "file:"
+        ? `${window.location.href.replace(/[?#].*$/, "")}#/zbirke`
+        : `${window.location.origin}/zbirke`;
+    const url = `${base}?import=${payload}`;
     if (navigator.clipboard) {
       navigator.clipboard.writeText(url);
       setPoruka("Poveznica kopirana u međuspremnik.");
