@@ -24,11 +24,58 @@ export default function Rijec() {
   const { zbirke, napravi, dodaj } = useCollections();
   const [nova, setNova] = useState("");
   const [poruka, setPoruka] = useState("");
+  const [snimke, setSnimke] = useState([]);
+  const [snima, setSnima] = useState(false);
+  const [audioUrls, setAudioUrls] = useState({});
+  const [serverSnimke, setServerSnimke] = useState([]);
+  const recorderRef = useRef(null);
+  const chunksRef = useRef([]);
+
   const rijec = words.find((r) => r.id === id);
+  const rijecId = rijec?.id;
+  const backendId = rijec?.backendId;
 
   useEffect(() => {
-    if (rijec) zabiljeziRijec(rijec.id);
-  }, [rijec]);
+    if (rijecId) zabiljeziRijec(rijecId);
+  }, [rijecId]);
+
+  useEffect(() => {
+    if (!rijecId) return;
+    let aktivno = true;
+    dohvatiSnimke(rijecId)
+      .then((s) => {
+        if (aktivno) setSnimke(s);
+      })
+      .catch(() => {});
+    return () => {
+      aktivno = false;
+    };
+  }, [rijecId]);
+
+  useEffect(() => {
+    if (!rijecId) return;
+    let aktivno = true;
+    (async () => {
+      try {
+        const d = await api.recordings(backendId || rijecId);
+        if (aktivno) setServerSnimke(d.recordings || []);
+      } catch {
+        // backend nedostupan
+      }
+    })();
+    return () => { aktivno = false; };
+  }, [rijecId, backendId]);
+
+  useEffect(() => {
+    const urls = {};
+    for (const s of snimke) {
+      urls[s.id] = URL.createObjectURL(s.blob);
+    }
+    setAudioUrls(urls);
+    return () => {
+      Object.values(urls).forEach((u) => URL.revokeObjectURL(u));
+    };
+  }, [snimke]);
 
   if (!rijec) {
     return (
@@ -44,53 +91,10 @@ export default function Rijec() {
   }
 
   const govor = getGovor(rijec.govorId);
-  const narjecje = getNarjecje(govor?.narjecje);
+  const narjecje = getNarjecje(govor?.narjecje) || { boja: "transparent", naziv: "" };
   const povezane = words
     .filter((r) => r.govorId === rijec.govorId && r.id !== rijec.id)
     .slice(0, 3);
-
-  const [snimke, setSnimke] = useState([]);
-  const [snima, setSnima] = useState(false);
-  const [audioUrls, setAudioUrls] = useState({});
-  const [serverSnimke, setServerSnimke] = useState([]);
-  const recorderRef = useRef(null);
-  const chunksRef = useRef([]);
-
-  useEffect(() => {
-    let aktivno = true;
-    dohvatiSnimke(rijec.id)
-      .then((s) => {
-        if (aktivno) setSnimke(s);
-      })
-      .catch(() => {});
-    return () => {
-      aktivno = false;
-    };
-  }, [rijec.id]);
-
-  useEffect(() => {
-    let aktivno = true;
-    (async () => {
-      try {
-        const d = await api.recordings(rijec.backendId || rijec.id);
-        if (aktivno) setServerSnimke(d.recordings || []);
-      } catch {
-        // backend nedostupan
-      }
-    })();
-    return () => { aktivno = false; };
-  }, [rijec.id, rijec.backendId]);
-
-  useEffect(() => {
-    const urls = {};
-    for (const s of snimke) {
-      urls[s.id] = URL.createObjectURL(s.blob);
-    }
-    setAudioUrls(urls);
-    return () => {
-      Object.values(urls).forEach((u) => URL.revokeObjectURL(u));
-    };
-  }, [snimke]);
 
   const zapocniSnimanje = async () => {
     if (!podrzavaSnimanje()) return;
