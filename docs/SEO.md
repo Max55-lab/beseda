@@ -28,11 +28,26 @@ Otvori u pregledniku (poželjno u incognito prozoru):
 
 > **Važno:** kartica „Google indeks” prikazuje stari crawl, ne trenutno stanje. Ako piše „Otkriće: Nije provjereno u testovima uživo”, znači da live test nije pokrenut. Uvijek klikni **Testiraj uživo** i gledaj rezultat tog testa. Stari indeks može pokazivati grešku još dan-dva nakon popravka — to je normalno.
 
-> Google može keširati `robots.txt` do 24 sata. Ako i dalje piše „Blokirano datotekom robots.txt”, pričekaj dan i ponovi provjeru — datoteka je na poslužitelju već ispravna.
+> Google može keširati `robots.txt` do 24 sata. Ako i dalje piše „Blokirano datotekom robots.txt”, pričekaj dan i ponovi provjeru.
+
+## Zašto se `robots.txt` povremeno vraćao na `Disallow: /`
+
+Renderova dokumentacija za besplatne web servise kaže: dok je servis uspavan (spava nakon 15 minuta bez prometa), svaki zahtjev za `/robots.txt` automatski dobiva:
+
+```text
+User-agent: *
+Disallow: /
+```
+
+Takav zahtjev **ne budi servis**. Kad Googlebot dođe u tom prozoru, zapamti `Disallow: /` i ne indeksira stranicu. Zato je datoteka na poslužitelju ispravna, ali Google povremeno vidi staru.
+
+Rješenje: servis se mora stalno držati budnim. U repozitoriju `beseda-backend` nalazi se GitHub Actions workflow `.github/workflows/keepalive.yml` koji svake 4 minute poziva `/api/health`. Time servis nikad ne miruje 15 minuta.
+
+> **Ograničenje:** Render daje 750 besplatnih sati mjesečno po workspaceu. Jedan servis 24/7 troši ~730 sati, pa je gotovo cijela kvota iskorištena. Ako u istom workspaceu radi još jedan besplatni servis, oba mogu biti suspendirana prije kraja mjeseca. Za ozbiljan rad preporučuje se plaćeni plan.
 
 ## Napomene
 
-- **Render free tier** uspava servis nakon neaktivnosti. Prvi posjet nakon toga može trajati 30–60 s; Googlebot to ponekad zabilježi kao spor odgovor. Za ozbiljniji promet potreban je plaćeni plan ili drugi hosting.
+- **Render free tier** uspava servis nakon 15 minuta neaktivnosti. Prvi posjet nakon toga može trajati 30–60 s; Googlebot to ponekad zabilježi kao spor odgovor. Za ozbiljniji promet potreban je plaćeni plan ili drugi hosting.
 - Aplikacija je klijentski renderirana (React SPA). Google zna izvršiti JavaScript, ali za savršen SEO podstranica bilo bi potrebno predrenderiranje (SSR/prerender). Ovo je sljedeći korak ako želiš da svaka riječ ima potpuni HTML pri prvom dohvaćanju.
 - `robots.txt` i `sitemap.xml` nalaze se u `beseda/public/` i kopiraju se u `beseda-backend/public/` pri svakom build-u.
 - Sitemap se generira naredbom:
